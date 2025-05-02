@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Control Chatbot</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00796b;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .chat-box {
+            flex: 1;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            background-color: #f5f5f5;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .user-message {
+            background: #00796b;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: white;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00796b;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #00796b;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #00695c;
+        }
+
+        .climate-fact {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .suggestion {
+            display: inline-block;
+            background: #e3f2fd;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .suggestion:hover {
+            background: #bbdefb;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h1>🌍 Climate Control Chatbot</h1>
+            <p>Ask me about climate change, sustainability, and eco-friendly practices</p>
+        </div>
+        <div class="chat-box" id="chatBox">
+            <div class="message bot-message">
+                Hello! I'm your Climate Control Assistant. How can I help you today? 
+                You can ask me about:
+                <div class="suggestion" onclick="handleSuggestion('climate change')">Climate Change</div>
+                <div class="suggestion" onclick="handleSuggestion('renewable energy')">Renewable Energy</div>
+                <div class="suggestion" onclick="handleSuggestion('carbon footprint')">Carbon Footprint</div>
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Ask about climate change..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const climateData = {
+            "climate change": {
+                facts: [
+                    "Global temperatures have risen by about 1.1°C since the pre-industrial era.",
+                    "The last decade was the warmest on record.",
+                    "Sea levels have risen by about 20 cm since 1900."
+                ],
+                response: "Climate change refers to long-term shifts in temperatures and weather patterns. Human activities, particularly the burning of fossil fuels, have been the main driver of climate change since the 1800s."
+            },
+            "renewable energy": {
+                facts: [
+                    "Renewable energy sources provided about 29% of global electricity in 2020.",
+                    "Solar power is now the cheapest source of electricity in many parts of the world.",
+                    "Wind energy could provide more than 40 times the current global electricity demand."
+                ],
+                response: "Renewable energy comes from natural sources that are constantly replenished, such as sunlight, wind, water, and geothermal heat. These sources produce much less greenhouse gas emissions than fossil fuels."
+            },
+            "carbon footprint": {
+                facts: [
+                    "The average carbon footprint for a person in the United States is 16 tons.",
+                    "Food production accounts for 26% of global greenhouse gas emissions.",
+                    "Transportation contributes to about 14% of global emissions."
+                ],
+                response: "A carbon footprint is the total amount of greenhouse gases (including carbon dioxide and methane) that are generated by our actions. Reducing your carbon footprint can help mitigate climate change."
+            }
+        };
+
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const message = input.value.trim();
+            
+            if (message === "") return;
+
+            addMessage(message, "user");
+            processMessage(message);
+            input.value = "";
+        }
+
+        function addMessage(text, sender) {
+            const chatBox = document.getElementById("chatBox");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleSuggestion(topic) {
+            document.getElementById("userInput").value = topic;
+            sendMessage();
+        }
+
+        function processMessage(message) {
+            const lowerMessage = message.toLowerCase();
+            let response = "";
+            let facts = [];
+
+            // Check if the message contains any of our topics
+            for (const [topic, data] of Object.entries(climateData)) {
+                if (lowerMessage.includes(topic)) {
+                    response = data.response;
+                    facts = data.facts;
+                    break;
+                }
+            }
+
+            if (!response) {
+                response = "I'm not sure about that specific topic. You can ask me about climate change, renewable energy, or carbon footprint.";
+            }
+
+            // Add the main response
+            addMessage(response, "bot");
+
+            // Add facts if available
+            if (facts.length > 0) {
+                const factsDiv = document.createElement("div");
+                factsDiv.className = "climate-fact";
+                factsDiv.innerHTML = "<strong>Did you know?</strong><br>" + facts.join("<br>");
+                document.getElementById("chatBox").appendChild(factsDiv);
+            }
+
+            // Add suggestions
+            const suggestionsDiv = document.createElement("div");
+            suggestionsDiv.className = "message bot-message";
+            suggestionsDiv.innerHTML = "You might also want to know about: " +
+                Object.keys(climateData).map(topic => 
+                    `<div class="suggestion" onclick="handleSuggestion('${topic}')">${topic}</div>`
+                ).join("");
+            document.getElementById("chatBox").appendChild(suggestionsDiv);
+        }
+
+        // Handle Enter key
+        document.getElementById("userInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 
